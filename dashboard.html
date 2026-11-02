@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kalshi Bot Dashboard</title>
+<style>
+  :root{
+    --bg:#0e1113; --panel:#171b1e; --panel2:#1d2226; --line:#2a3035; --text:#eef1f3; --mute:#8d969c;
+    --green:#4cc35a; --red:#ef5d55; --blue:#5aa7f0; --amber:#e3a83b; --gray:#5d666c;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 "Segoe UI",-apple-system,Roboto,sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:18px}
+  header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  h1{font-size:20px;margin:0;font-weight:650}
+  .pill{padding:4px 10px;border-radius:999px;font-size:12px;font-weight:650;letter-spacing:.02em}
+  .pill.run{background:#173a1d;color:var(--green)} .pill.pause{background:#3c2f12;color:var(--amber)}
+  .pill.stop{background:#3d1a18;color:var(--red)} .pill.err{background:#3d1a18;color:var(--red)}
+  .upd{color:var(--mute);font-size:12px}
+  .spacer{flex:1}
+  button{font:inherit;border:0;border-radius:9px;padding:9px 16px;cursor:pointer;font-weight:600}
+  .btn-pause{background:#3c2f12;color:var(--amber)} .btn-resume{background:var(--green);color:#0b0e0f}
+  .btn-save{background:var(--blue);color:#0b0e0f}
+  .grid{display:grid;gap:12px}
+  .tiles{grid-template-columns:repeat(6,1fr)}
+  @media(max-width:980px){.tiles{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:560px){.tiles{grid-template-columns:repeat(2,1fr)}}
+  .tile{background:var(--panel);border-radius:12px;padding:12px 14px}
+  .tile .k{color:var(--mute);font-size:12px}
+  .tile .v{font-size:22px;font-weight:650;margin-top:2px;font-variant-numeric:tabular-nums}
+  .tile .s{color:var(--mute);font-size:12px;margin-top:2px}
+  .pos{color:var(--green)} .neg{color:var(--red)}
+  .verdict{margin:12px 0 18px;background:var(--panel);border-left:4px solid var(--amber);border-radius:10px;padding:11px 14px}
+  .verdict.good{border-color:var(--green)} .verdict.bad{border-color:var(--red)}
+  .cols{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);align-items:start}
+  .cols>div{min-width:0}
+  @media(max-width:900px){.cols{grid-template-columns:1fr}}
+  .panel{background:var(--panel);border-radius:12px;padding:14px 16px}
+  .panel h2{font-size:15px;margin:0 0 10px;font-weight:650}
+  .panel h2 small{color:var(--mute);font-weight:400;font-size:12px;margin-left:6px}
+  .mkt{background:var(--panel2);border-radius:10px;padding:12px;margin-bottom:10px}
+  .mkt-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .mkt-title{font-weight:600}
+  .badge{padding:3px 9px;border-radius:6px;font-size:12px;font-weight:700}
+  .b-BUY{background:var(--green);color:#0b0e0f} .b-HOLDING{background:var(--blue);color:#0b0e0f}
+  .b-NO{background:#2c3237;color:#c9d0d4} .b-WAIT,.b-PASSED,.b-DONE{background:#2c3237;color:var(--mute)}
+  .b-STOPPED{background:var(--red);color:#0b0e0f} .b-PAUSED{background:var(--amber);color:#0b0e0f}
+  .reason{margin-top:8px;color:#d3d9dc}
+  .model{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+  .model div{background:#14181b;border-radius:8px;padding:6px 8px}
+  .model span{display:block;color:var(--mute);font-size:11px}
+  .model b{font-weight:650;font-variant-numeric:tabular-nums}
+  @media(max-width:560px){.model{grid-template-columns:repeat(2,1fr)}}
+  .timeline{position:relative;height:8px;background:#2a3035;border-radius:4px;margin:10px 0 4px}
+  .timeline .win{position:absolute;top:0;bottom:0;background:#2e4d33;border-radius:4px}
+  .timeline .now{position:absolute;top:-4px;width:3px;height:16px;background:var(--text);border-radius:2px}
+  .tl-lbl{display:flex;justify-content:space-between;color:var(--mute);font-size:11px}
+  .odds{display:flex;height:26px;border-radius:7px;overflow:hidden;margin-top:10px;font-size:12px;font-weight:650}
+  .odds div{display:flex;align-items:center;padding:0 8px;white-space:nowrap}
+  .odds .y{background:#1f4a27;color:#bdf0c4} .odds .n{background:#4a2321;color:#f6c4c0;justify-content:flex-end}
+  .empty{color:var(--mute);padding:10px 0}
+  form .row{display:grid;grid-template-columns:1fr 120px;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line)}
+  form .row:last-of-type{border-bottom:0}
+  form label{font-weight:550}
+  form .hint{display:block;color:var(--mute);font-size:12px;font-weight:400}
+  .inp{display:flex;align-items:center;background:#0f1315;border:1px solid var(--line);border-radius:8px;padding:0 8px}
+  .inp span{color:var(--mute)}
+  .inp input{width:100%;background:none;border:0;color:var(--text);font:inherit;padding:7px 4px;text-align:right}
+  .coinrow{border-bottom:0!important;display:block!important}
+  .coins{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 10px;margin-top:8px}
+  .coins label{font-weight:400;display:flex;align-items:center;gap:6px;background:#0f1315;border:1px solid var(--line);border-radius:8px;padding:6px 8px;cursor:pointer}
+  .coins label.on{border-color:var(--blue)}
+  .coinbtns{float:right;font-size:12px}
+  .coinbtns a{color:var(--blue);cursor:pointer;margin-left:10px}
+  .msg{margin-top:8px;font-size:13px;min-height:18px}
+  table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+  th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);font-size:13px;white-space:nowrap}
+  th{color:var(--mute);font-weight:500;font-size:12px}
+  td.r,th.r{text-align:right}
+  .tablewrap{max-height:360px;overflow:auto}
+  svg text{fill:var(--mute);font-size:11px}
+  .log{font:12px/1.5 Consolas,monospace;color:#b9c1c6;max-height:220px;overflow:auto;white-space:pre-wrap;background:#0f1315;border-radius:8px;padding:10px}
+  .sec{margin-top:12px}
+  .support-btn{color:var(--mute);text-decoration:none;font-size:13px;padding:8px 12px;border:1px solid var(--line);border-radius:9px}
+  .support-btn:hover{color:var(--text);border-color:var(--gray)}
+  .thanks{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#1a1f16;border:1px solid #2f3b26;border-radius:10px;padding:11px 14px;margin:12px 0 0}
+  .thanks>div:first-child{flex:1;min-width:220px}
+  .thanks-btns{display:flex;gap:8px;flex-wrap:wrap}
+  .btn-coffee{background:var(--amber);color:#0b0e0f;text-decoration:none;font-weight:600;border-radius:9px;padding:8px 14px}
+  .btn-ghost{background:none;color:var(--mute);border:1px solid var(--line);padding:8px 12px}
+  .err-banner{display:none;background:#3d1a18;color:#ffd0cc;border-radius:10px;padding:10px 14px;margin-bottom:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Kalshi 15-Min Bot</h1>
+    <span class="pill run" id="pill">Starting…</span>
+    <span class="upd" id="upd"></span>
+    <span class="spacer"></span>
+    <a id="supportBtn" class="support-btn" target="_blank" rel="noopener" style="display:none">☕ Support</a>
+    <button id="pauseBtn" class="btn-pause">Pause bot</button>
+  </header>
+
+  <div class="err-banner" id="errBanner"></div>
+
+  <div class="grid tiles">
+    <div class="tile"><div class="k">Today's profit / loss</div><div class="v" id="tToday">–</div><div class="s" id="tTodayS"></div></div>
+    <div class="tile"><div class="k">Loss limit left today</div><div class="v" id="tLeft">–</div><div class="s" id="tLeftS"></div></div>
+    <div class="tile"><div class="k">All-time profit / loss</div><div class="v" id="tAll">–</div><div class="s" id="tAllS"></div></div>
+    <div class="tile"><div class="k">Win rate</div><div class="v" id="tWin">–</div><div class="s" id="tWinS"></div></div>
+    <div class="tile"><div class="k">Money in open bets</div><div class="v" id="tOpen">–</div><div class="s" id="tOpenS"></div></div>
+    <div class="tile"><div class="k">Kalshi cash</div><div class="v" id="tCash">–</div><div class="s" id="tCashS">available to bet</div></div>
+  </div>
+
+  <div class="thanks" id="thanks" style="display:none">
+    <div><b>Good day today!</b> If this bot has been useful, a coffee helps keep it updated and free.</div>
+    <div class="thanks-btns">
+      <a id="thanksGo" class="btn-coffee" target="_blank" rel="noopener">☕ Buy me a coffee</a>
+      <button data-a="later" class="btn-ghost">Maybe later</button>
+      <button data-a="never" class="btn-ghost">Don't show again</button>
+    </div>
+  </div>
+
+  <div class="verdict" id="verdict">Waiting for the first results…</div>
+
+  <div class="grid cols">
+    <div>
+      <div class="panel">
+        <h2>Right now <small>what the bot thinks about the current bet</small></h2>
+        <div id="markets"><div class="empty">Loading the market…</div></div>
+      </div>
+
+      <div class="panel sec">
+        <h2>Profit over time <small>total after every finished bet</small></h2>
+        <div id="chart"><div class="empty">The chart appears after the first bet finishes.</div></div>
+      </div>
+
+      <div class="panel sec">
+        <h2>Bets <small>newest first</small></h2>
+        <div class="tablewrap"><table id="trades"></table></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h2>Your limits <small>changes apply right away</small></h2>
+        <form id="settings">
+          <div class="row"><label>Each bet<span class="hint">Dollars used on one bet</span></label>
+            <div class="inp"><span>$</span><input name="STAKE_PER_TRADE" inputmode="decimal"></div></div>
+          <div class="row"><label>Or bet a share of your cash<span class="hint">0 = use the dollar amount above. 10 = each bet is 10% of your Kalshi cash</span></label>
+            <div class="inp"><input name="STAKE_PCT" data-pct inputmode="decimal"><span>%</span></div></div>
+          <div class="row"><label>Most in open bets<span class="hint">Never more than this at once</span></label>
+            <div class="inp"><span>$</span><input name="MAX_AT_RISK" inputmode="decimal"></div></div>
+          <div class="row"><label>Daily loss limit<span class="hint">Stops for the day after losing this</span></label>
+            <div class="inp"><span>$</span><input name="DAILY_LOSS_LIMIT" inputmode="decimal"></div></div>
+          <div class="row"><label>Only bet with an edge of<span class="hint">How much cheaper than the bot's odds Kalshi must be, after fees</span></label>
+            <div class="inp"><input name="MIN_EDGE" data-cents inputmode="decimal"><span>¢</span></div></div>
+          <div class="row"><label>Lowest price to buy<span class="hint">Skip long shots cheaper than this</span></label>
+            <div class="inp"><input name="MIN_PRICE" data-cents inputmode="decimal"><span>¢</span></div></div>
+          <div class="row"><label>Highest price to buy<span class="hint">Skip near-sure things dearer than this</span></label>
+            <div class="inp"><input name="MAX_PRICE" data-cents inputmode="decimal"><span>¢</span></div></div>
+          <div class="row"><label>Cash out early at<span class="hint">Sell when a bet is up this much</span></label>
+            <div class="inp"><input name="TAKE_PROFIT" data-pct inputmode="decimal"><span>%</span></div></div>
+          <div class="row"><label>Start buying at minute<span class="hint">Of each 15-minute window</span></label>
+            <div class="inp"><input name="ENTRY_START_MIN" inputmode="decimal"></div></div>
+          <div class="row"><label>Stop buying at minute<span class="hint">Of each 15-minute window</span></label>
+            <div class="inp"><input name="ENTRY_END_MIN" inputmode="decimal"></div></div>
+          <div class="row coinrow"><label>Coins to trade <span class="coinbtns"><a id="allCoins">All</a><a id="noCoins">None</a></span><span class="hint">More coins = more bets. Your money limits still apply to all of them together.</span></label><div class="coins" id="coins"></div></div>
+          <button type="submit" class="btn-save" style="margin-top:10px;width:100%">Save limits</button>
+          <div class="msg" id="saveMsg"></div>
+        </form>
+      </div>
+
+      <div class="panel sec">
+        <h2>By day</h2>
+        <table id="days"></table>
+      </div>
+
+      <div class="panel sec">
+        <h2>Activity <small>latest bot messages</small></h2>
+        <div class="log" id="log"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const money = v => v == null ? '–' : (v < 0 ? '−$' : '$') + Math.abs(v).toFixed(2);
+const signed = v => v == null ? '–' : (v > 0 ? '+' : v < 0 ? '−' : '') + '$' + Math.abs(v).toFixed(2);
+const cents = v => v == null ? '–' : Math.round(v * 100) + '¢';
+const cls = v => v > 0 ? 'pos' : v < 0 ? 'neg' : '';
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let data = null, formDirty = false;
+
+function setTile(id, text, c, sub) {
+  $(id).textContent = text; $(id).className = 'v ' + (c || '');
+  if (sub !== undefined) $(id + 'S').textContent = sub;
+}
+
+function render(d) {
+  data = d;
+  const t = d.today, st = d.stats, live = d.live;
+  // header
+  const stopped = t.loss_left <= 0;
+  const pill = $('pill');
+  if (live.error) { pill.className = 'pill err'; pill.textContent = 'Connection problem'; }
+  else if (d.paused) { pill.className = 'pill pause'; pill.textContent = 'Paused'; }
+  else if (stopped) { pill.className = 'pill stop'; pill.textContent = 'Stopped for today'; }
+  else { pill.className = 'pill run'; pill.textContent = 'Running'; }
+  $('upd').textContent = live.updated ? 'Updated ' + live.updated : '';
+  $('pauseBtn').textContent = d.paused ? 'Resume bot' : 'Pause bot';
+  $('pauseBtn').className = d.paused ? 'btn-resume' : 'btn-pause';
+  const problem = live.error ? 'Kalshi error: ' + live.error + ' — the bot keeps retrying.' : live.fund_problem;
+  $('errBanner').style.display = problem ? 'block' : 'none';
+  $('errBanner').textContent = problem || '';
+
+  // tiles
+  setTile('tToday', signed(t.pnl), cls(t.pnl), 'spent ' + money(t.spent) + ' on bets today');
+  setTile('tLeft', money(Math.max(0, t.loss_left)), t.loss_left <= 0 ? 'neg' : '',
+    t.loss_left > d.settings.DAILY_LOSS_LIMIT ? money(d.settings.DAILY_LOSS_LIMIT) + ' limit + today\'s gains' : 'of ' + money(d.settings.DAILY_LOSS_LIMIT) + ' daily limit');
+  setTile('tAll', signed(st.total_pnl), cls(st.total_pnl), st.settled + ' finished bet' + (st.settled === 1 ? '' : 's'));
+  setTile('tWin', st.win_rate == null ? '–' : Math.round(st.win_rate * 100) + '%',
+    st.win_rate == null ? '' : (st.avg_price != null && st.win_rate >= st.avg_price ? 'pos' : 'neg'),
+    st.avg_price == null ? 'no bets yet' : 'need ' + Math.round(st.avg_price * 100) + '% to break even');
+  setTile('tOpen', money(t.open_cost), '', d.open.length + ' open · max ' + money(d.settings.MAX_AT_RISK));
+  $('tCash').textContent = money(live.balance);
+  const pct = d.settings.STAKE_PCT;
+  $('tCashS').textContent = pct > 0 ? 'next bet ≈ ' + money(Math.max(1, (live.balance || 0) * pct)) + ' (' + Math.round(pct * 100) + '%)' : 'bets never exceed this';
+
+  // verdict
+  const v = $('verdict');
+  if (!st.settled) { v.className = 'verdict'; v.textContent = 'No finished bets yet. After 20–30 bets you\'ll see whether this is making money.'; }
+  else {
+    const need = Math.round(st.avg_price * 100), got = Math.round(st.win_rate * 100), edge = got - need;
+    const few = st.settled < 20;
+    v.className = 'verdict ' + (few ? '' : edge >= 0 ? 'good' : 'bad');
+    v.textContent = `You pay ${need}¢ on average, so you need to win ${need}% of bets to break even. You're winning ${got}% (${edge >= 0 ? '+' : ''}${edge} points). ` +
+      (few ? `Only ${st.settled} bet${st.settled === 1 ? '' : 's'} so far — too few to judge.` :
+       edge >= 0 ? 'So far the strategy is ahead.' : 'So far the strategy is losing — consider pausing or changing the limits.');
+  }
+
+  const sup = d.support || {};
+  $('supportBtn').style.display = sup.url ? '' : 'none';
+  if (sup.url) { $('supportBtn').href = sup.url; $('thanksGo').href = sup.url; }
+  if (!thanksClosed) $('thanks').style.display = sup.ask ? 'flex' : 'none';
+
+  renderMarkets(live.markets || []);
+  renderChart(st.series);
+  renderTrades(d.trades);
+  renderDays(st.days);
+  if (!formDirty) fillForm(d.settings, d.known_series);
+  const lg = $('log'); const atBottom = lg.scrollTop + lg.clientHeight >= lg.scrollHeight - 5;
+  lg.textContent = d.log.join('\n'); if (atBottom) lg.scrollTop = lg.scrollHeight;
+}
+
+function renderMarkets(ms) {
+  if (!ms.length) { $('markets').innerHTML = '<div class="empty">No open market right now. The next 15-minute window will appear here.</div>'; return; }
+  const s = data.settings;
+  $('markets').innerHTML = ms.map(m => {
+    const yes = m.yes_bid != null && m.yes_ask != null ? (m.yes_bid + m.yes_ask) / 2 : null;
+    const ypct = yes == null ? 50 : Math.round(yes * 100);
+    const badge = m.decision === 'NO TRADE' ? 'NO' : m.decision;
+    const label = {BUY:'BUY', HOLDING:'HOLDING', 'NO TRADE':'NO TRADE', WAIT:'WATCHING', PASSED:'WINDOW PASSED', DONE:'DONE', STOPPED:'STOPPED', PAUSED:'PAUSED'}[m.decision] || m.decision;
+    const minute = Math.max(0, Math.min(15, m.minute));
+    return `<div class="mkt">
+      <div class="mkt-top"><div class="mkt-title">${esc(m.title || m.coin + ' · ' + m.ticker)}</div>
+        <span class="badge b-${badge}">${label}</span></div>
+      <div class="odds"><div class="y" style="width:${ypct}%">YES ${cents(m.yes_ask)}</div><div class="n" style="width:${100 - ypct}%">NO ${cents(m.no_ask)}</div></div>
+      <div class="timeline"><div class="win" style="left:${s.ENTRY_START_MIN / 15 * 100}%;width:${(s.ENTRY_END_MIN - s.ENTRY_START_MIN) / 15 * 100}%"></div>
+        <div class="now" style="left:calc(${minute / 15 * 100}% - 1px)"></div></div>
+      <div class="tl-lbl"><span>min 0</span><span>minute ${m.minute} · ${Math.max(0, m.minutes_left)} min left · green = buying time</span><span>15</span></div>
+      ${m.spot != null ? `<div class="model">
+        <div><span>${esc(m.symbol)} now</span><b>${fmtPx(m.spot)}</b></div>
+        <div><span>Target</span><b>${fmtPx(m.target)}</b></div>
+        <div><span>Bot's odds</span><b>YES ${Math.round(m.chance_yes * 100)}%</b></div>
+        <div><span>Best deal</span><b class="${(Math.max(m.edge_yes ?? -1, m.edge_no ?? -1)) >= s.MIN_EDGE ? 'pos' : ''}">${edgeTxt(m)}</b></div>
+      </div>` : ''}
+      <div class="reason">${esc(m.reason)}</div>
+    </div>`;
+  }).join('');
+}
+
+function fmtPx(v) { if (v == null) return '–'; const d = v >= 1000 ? 2 : v >= 1 ? 4 : 6; return '$' + (+v).toLocaleString(undefined, {maximumFractionDigits: d}); }
+function edgeTxt(m) {
+  const ey = m.edge_yes ?? -9, en = m.edge_no ?? -9, e = Math.max(ey, en);
+  if (e <= -9) return '–';
+  const side = ey >= en ? 'YES' : 'NO';
+  return side + ' ' + (e >= 0 ? '+' : '−') + Math.abs(Math.round(e * 100)) + '¢';
+}
+
+function renderChart(series) {
+  if (!series.length) { $('chart').innerHTML = '<div class="empty">The chart appears after the first bet finishes.</div>'; return; }
+  const W = 640, H = 220, L = 46, R = 10, T = 12, B = 26;
+  const pts = [{v: 0}].concat(series);
+  const vals = pts.map(p => p.v);
+  let lo = Math.min(0, ...vals), hi = Math.max(0, ...vals);
+  if (hi - lo < 1) { hi += 0.5; lo -= 0.5; }
+  const pad = (hi - lo) * 0.1; lo -= pad; hi += pad;
+  const x = i => L + (W - L - R) * (pts.length === 1 ? 0 : i / (pts.length - 1));
+  const y = v => T + (H - T - B) * (1 - (v - lo) / (hi - lo));
+  const last = vals[vals.length - 1];
+  const color = last >= 0 ? 'var(--green)' : 'var(--red)';
+  const path = pts.map((p, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(p.v).toFixed(1)).join(' ');
+  const area = path + ` L${x(pts.length - 1).toFixed(1)} ${y(0).toFixed(1)} L${x(0).toFixed(1)} ${y(0).toFixed(1)} Z`;
+  const ticks = [];
+  for (let k = 0; k <= 4; k++) { const v = lo + (hi - lo) * k / 4; ticks.push(`<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="#23292d"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${signed(Math.round(v * 100) / 100)}</text>`); }
+  $('chart').innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Cumulative profit">
+    ${ticks.join('')}
+    <line x1="${L}" x2="${W - R}" y1="${y(0)}" y2="${y(0)}" stroke="#4a535a" stroke-dasharray="4 4"/>
+    <path d="${area}" fill="${color}" opacity=".12"/>
+    <path d="${path}" fill="none" stroke="${color}" stroke-width="2.2" stroke-linejoin="round"/>
+    <circle cx="${x(pts.length - 1)}" cy="${y(last)}" r="4" fill="${color}"/>
+    <text x="${L}" y="${H - 6}">start</text><text x="${W - R}" y="${H - 6}" text-anchor="end">now · ${series.length} bets · ${signed(last)}</text>
+  </svg>`;
+}
+
+function renderTrades(rows) {
+  if (!rows.length) { $('trades').innerHTML = '<tr><td class="empty">No bets yet.</td></tr>'; return; }
+  const names = {BUY: 'Bought', SELL: 'Cashed out', SETTLE: 'Result'};
+  $('trades').innerHTML = '<tr><th>Time</th><th>What</th><th>Side</th><th class="r">Qty</th><th class="r">Price</th><th class="r">Amount</th><th class="r">Profit</th></tr>' +
+    rows.map(r => {
+      const p = r['pnl_$'] === '' ? null : parseFloat(r['pnl_$']);
+      const what = r.event === 'SETTLE' ? (r.note === 'won' ? 'Won' : 'Lost') : names[r.event] || r.event;
+      return `<tr><td>${esc(r.time.slice(5, 16))}</td><td>${esc(what)}</td><td>${esc(r.side)}</td><td class="r">${esc(r.contracts)}</td>
+        <td class="r">${r.event === 'SETTLE' ? '' : cents(parseFloat(r.price))}</td><td class="r">${money(parseFloat(r['amount_$']))}</td>
+        <td class="r ${cls(p)}">${p == null ? '' : signed(p)}</td></tr>`;
+    }).join('');
+}
+
+function renderDays(days) {
+  if (!days.length) { $('days').innerHTML = '<tr><td class="empty">Nothing yet.</td></tr>'; return; }
+  $('days').innerHTML = '<tr><th>Day</th><th class="r">Won</th><th class="r">Lost</th><th class="r">Profit</th></tr>' +
+    days.map(d => `<tr><td>${esc(d.day)}</td><td class="r">${d.wins}</td><td class="r">${d.losses}</td><td class="r ${cls(d.pnl)}">${signed(d.pnl)}</td></tr>`).join('');
+}
+
+function fillForm(s, known) {
+  const f = $('settings');
+  f.querySelectorAll('input[name]').forEach(inp => {
+    const v = s[inp.name]; if (v === undefined) return;
+    if (inp.hasAttribute('data-cents') || inp.hasAttribute('data-pct')) inp.value = Math.round(v * 100);
+    else if (inp.name.endsWith('_MIN')) inp.value = +(+v).toFixed(1);
+    else inp.value = (+v).toFixed(2);
+  });
+  $('coins').innerHTML = Object.entries(known).map(([k, name]) =>
+    `<label class="${s.SERIES.includes(k) ? 'on' : ''}"><input type="checkbox" value="${k}" ${s.SERIES.includes(k) ? 'checked' : ''}> ${esc(name)}</label>`).join('');
+}
+
+function markCoins() { $('coins').querySelectorAll('label').forEach(l => l.classList.toggle('on', l.querySelector('input').checked)); }
+function setAll(v) { $('coins').querySelectorAll('input').forEach(c => c.checked = v); markCoins(); $('settings').dispatchEvent(new Event('input')); }
+$('allCoins').addEventListener('click', () => setAll(true));
+$('noCoins').addEventListener('click', () => setAll(false));
+$('settings').addEventListener('change', markCoins);
+$('settings').addEventListener('input', () => { formDirty = true; $('saveMsg').textContent = 'Not saved yet'; $('saveMsg').style.color = 'var(--amber)'; });
+$('settings').addEventListener('submit', async e => {
+  e.preventDefault();
+  const body = {};
+  $('settings').querySelectorAll('input[name]').forEach(inp => {
+    let v = parseFloat(String(inp.value).replace(',', '.'));
+    if (inp.hasAttribute('data-cents') || inp.hasAttribute('data-pct')) v = v / 100;
+    body[inp.name] = v;
+  });
+  body.SERIES = [...$('coins').querySelectorAll('input:checked')].map(c => c.value);
+  const res = await post(body);
+  const m = $('saveMsg');
+  if (res.ok) { formDirty = false; m.style.color = 'var(--green)'; m.textContent = 'Saved. The bot is using your new limits.'; refresh(); }
+  else { m.style.color = 'var(--red)'; m.textContent = (res.errors || ['Could not save']).join('. '); }
+});
+
+let thanksClosed = false;
+async function supportAction(action) {
+  thanksClosed = true; $('thanks').style.display = 'none';
+  try { await fetch('/api/support', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({action})}); } catch (e) {}
+}
+$('thanksGo').addEventListener('click', () => supportAction('clicked'));
+document.querySelectorAll('#thanks button').forEach(b => b.addEventListener('click', () => supportAction(b.dataset.a)));
+
+$('pauseBtn').addEventListener('click', async () => {
+  if (!data) return;
+  await post({PAUSED: !data.paused}); refresh();
+});
+
+async function post(body) {
+  try {
+    const r = await fetch('/api/settings', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)});
+    return await r.json();
+  } catch (e) { return {errors: ['The bot is not running. Double-click run.bat.']}; }
+}
+
+async function refresh() {
+  try {
+    const r = await fetch('/api/status', {cache: 'no-store'});
+    render(await r.json());
+  } catch (e) {
+    $('pill').className = 'pill err'; $('pill').textContent = 'Bot not running';
+    $('errBanner').style.display = 'block';
+    $('errBanner').textContent = 'Can\'t reach the bot. Is the black window still open? Double-click run.bat to start it.';
+  }
+}
+refresh(); setInterval(refresh, 5000);
+</script>
+</body>
+</html>

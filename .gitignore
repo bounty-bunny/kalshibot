@@ -1,0 +1,18 @@
+# Your Kalshi key — never commit it
+*.pem
+*.key
+*.txt
+!README.txt
+
+# Your personal data
+settings.json
+bot_state.json
+bot_state.json.tmp
+settings.json.tmp
+support.json
+trades.csv
+bot_log.txt
+
+__pycache__/
+*.pyc
+.DS_Store

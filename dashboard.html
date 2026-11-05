@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kalshi Bot Dashboard</title>
+<title>EdgeHunter · Kalshi bot</title>
 <style>
   :root{
     --bg:#0e1113; --panel:#171b1e; --panel2:#1d2226; --line:#2a3035; --text:#eef1f3; --mute:#8d969c;
@@ -89,13 +89,55 @@
   .thanks-btns{display:flex;gap:8px;flex-wrap:wrap}
   .btn-coffee{background:var(--amber);color:#0b0e0f;text-decoration:none;font-weight:600;border-radius:9px;padding:8px 14px}
   .btn-ghost{background:none;color:var(--mute);border:1px solid var(--line);padding:8px 12px}
+  .lsbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--panel);border-radius:10px;padding:11px 14px;margin:12px 0 0}
+  .lsk{font-weight:650;color:#c8a6ff}
+  .lsmeter{flex:0 0 160px;height:8px;background:#2a3035;border-radius:4px;overflow:hidden}
+  .lsmeter div{height:100%;background:#9b6cf0}
+  #lstext{color:#d3d9dc;font-size:13px}
+  .b-LONG{background:#9b6cf0;color:#0b0e0f}
+  select{width:100%;background:#0f1315;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:7px;font:inherit}
+  .snote{color:var(--amber);font-size:13px;margin-bottom:8px}
+  .game{background:var(--panel2);border-radius:10px;padding:11px 12px;margin-bottom:8px}
+  .game-top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+  .game-title{font-weight:600}
+  .game-meta{color:var(--mute);font-size:12px;margin-top:2px}
+  .game table{margin-top:8px}
+  .game td,.game th{padding:4px 6px;font-size:12.5px}
+  .hint2{color:var(--mute);font-size:12px;margin-top:6px}
+  .b-LIVE{background:var(--green);color:#0b0e0f} .b-SHADOW{background:#3a4a5c;color:#cfe3ff}
+  .b-PAUSEDS{background:var(--red);color:#0b0e0f}
+  .mini{font-size:11px;padding:4px 8px;border-radius:6px;background:#24282b;color:var(--text);margin-left:4px}
+  .pol{background:var(--panel2);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+  .pol .q{font-size:13px} .pol .q span{color:var(--mute)}
+  .debate{background:var(--panel2);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+  .debate summary{cursor:pointer;color:var(--blue);font-size:12px;margin-top:6px}
+  .agent{font-size:12.5px;padding:3px 0;border-bottom:1px solid var(--line)}
+  .agent b{display:inline-block;min-width:105px}
+  .b-APPROVE{background:var(--green);color:#0b0e0f} .b-VETO{background:#5b2a27;color:#ffd0cc}
+  .section-title{font-size:16px;font-weight:650;margin:18px 0 8px}
+  .section-title small{color:var(--mute);font-weight:400;font-size:12px;margin-left:6px}
+  .tabs{display:flex;gap:6px;margin:22px 0 12px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .tab{background:none;color:var(--mute);border:0;border-bottom:2px solid transparent;border-radius:0;padding:10px 16px;font-size:15px;font-weight:600}
+  .tab.on{color:var(--text);border-bottom-color:var(--blue)}
+  .tcount{background:#2a3035;color:var(--text);border-radius:999px;padding:1px 8px;font-size:12px;margin-left:4px}
+  .tcount:empty{display:none}
+  .tabpane,.sg{display:none} .tabpane.on,.sg.on{display:block}
+  .mute{color:var(--mute)} tr.mute td{color:var(--mute)}
+  .kind{font-size:11px;padding:2px 7px;border-radius:6px;background:#2a3035;color:#cfd6da;white-space:nowrap}
+  .lshead.tog{cursor:pointer;user-select:none;display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+  .lshead.tog::after{content:"▾";color:var(--mute);font-size:14px;transition:transform .15s}
+  .lshead.tog.closed::after{transform:rotate(-90deg)}
+  .lshead.tog .hint{color:var(--mute);font-weight:400;text-transform:none;letter-spacing:0;font-size:12px;margin-left:auto;margin-right:10px}
+  .sbody.closed{display:none}
+  .fc3{grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+  .lshead{margin:14px 0 2px;font-weight:650;color:#c8a6ff;font-size:13px;text-transform:uppercase;letter-spacing:.04em}
   .err-banner{display:none;background:#3d1a18;color:#ffd0cc;border-radius:10px;padding:10px 14px;margin-bottom:12px}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1>Kalshi 15-Min Bot</h1>
+    <h1>EdgeHunter <span style="font-weight:400;color:var(--mute);font-size:14px">for Kalshi</span></h1>
     <span class="pill run" id="pill">Starting…</span>
     <span class="upd" id="upd"></span>
     <span class="spacer"></span>
@@ -105,7 +147,7 @@
 
   <div class="err-banner" id="errBanner"></div>
 
-  <div class="grid tiles">
+<div class="grid tiles">
     <div class="tile"><div class="k">Today's profit / loss</div><div class="v" id="tToday">–</div><div class="s" id="tTodayS"></div></div>
     <div class="tile"><div class="k">Loss limit left today</div><div class="v" id="tLeft">–</div><div class="s" id="tLeftS"></div></div>
     <div class="tile"><div class="k">All-time profit / loss</div><div class="v" id="tAll">–</div><div class="s" id="tAllS"></div></div>
@@ -114,6 +156,7 @@
     <div class="tile"><div class="k">Kalshi cash</div><div class="v" id="tCash">–</div><div class="s" id="tCashS">available to bet</div></div>
   </div>
 
+  
   <div class="thanks" id="thanks" style="display:none">
     <div><b>Good day today!</b> If this bot has been useful, a coffee helps keep it updated and free.</div>
     <div class="thanks-btns">
@@ -123,38 +166,95 @@
     </div>
   </div>
 
-  <div class="verdict" id="verdict">Waiting for the first results…</div>
+  
+  <div class="lsbar" id="lsbar" style="display:none">
+    <div class="lsk">Long-shot test</div>
+    <div class="lsmeter"><div id="lsfill"></div></div>
+    <div id="lstext"></div>
+  </div>
 
+  
+  <div class="section-title">Overview <small>what's happening across everything</small></div>
+  <div class="panel" id="openPanel" style="margin-bottom:12px">
+        <h2>Current bets <small id="openSub">real money and pretend bets waiting for a result</small></h2>
+        <div class="tablewrap" style="max-height:none"><table id="openBets"></table></div>
+      </div>
   <div class="grid cols">
     <div>
-      <div class="panel">
-        <h2>Right now <small>what the bot thinks about the current bet</small></h2>
-        <div id="markets"><div class="empty">Loading the market…</div></div>
-      </div>
+      <div class="verdict" id="verdict">Waiting for the first results…</div>
+      <div class="panel" id="aiPanel" style="margin-top:12px">
+    <h2>AI team <small id="aiSub">6 AI agents (Claude and/or GPT) debate each bet</small></h2>
+    <div id="aiNote" class="snote"></div>
+    <div id="aiLog"><div class="empty">No debates yet. The team is asked when the math finds a deal or a near miss.</div></div>
+  </div>
 
-      <div class="panel sec">
+  
+    </div>
+    <div>
+      <div class="panel">
         <h2>Profit over time <small>total after every finished bet</small></h2>
         <div id="chart"><div class="empty">The chart appears after the first bet finishes.</div></div>
       </div>
 
+      
       <div class="panel sec">
-        <h2>Bets <small>newest first</small></h2>
-        <div class="tablewrap"><table id="trades"></table></div>
+        <h2>By day</h2>
+        <table id="days"></table>
+      </div>
+
+      
+    </div>
+  </div>
+  <div class="panel" id="stratPanel" style="margin-top:12px">
+    <h2>Strategies <small>self-correcting: new ones prove themselves with pretend bets; losing ones pause themselves</small></h2>
+    <div class="tablewrap" style="max-height:none"><table id="strats"></table></div>
+    <div class="hint2" id="stratRules"></div>
+  </div>
+
+  
+
+  <div class="panel sec" id="fcPanel">
+    <h2>Who predicts best? <small id="fcSub">every market the bot looks at is scored once it settles, including ones it skipped</small></h2>
+    <div class="hint2" style="margin-bottom:8px">Score = Brier (0 is perfect, 0.25 is a coin flip; lower is better). "vs Kalshi" = how much better (+) or worse (−) than Kalshi's own price on the same markets. A real edge means beating Kalshi's price over hundreds of markets.</div>
+    <div id="fcBody"><div class="empty">Scores appear after the first markets settle (crypto: ~15 minutes).</div></div>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button class="tab" data-tab="coins">Coins <span class="tcount" id="tc-coins"></span></button>
+    <button class="tab" data-tab="sports">Sports <span class="tcount" id="tc-sports"></span></button>
+    <button class="tab" data-tab="politics">Politics &amp; others <span class="tcount" id="tc-politics"></span></button>
+  </div>
+
+  <div class="grid cols">
+    <div>
+      <div class="tabpane" data-tab="coins"><div class="panel">
+        <h2>Right now <small>what the bot thinks about each coin's current 15-minute bet</small></h2>
+        <div id="markets"><div class="empty">Loading the market…</div></div>
+      </div></div>
+      <div class="tabpane" data-tab="sports"><div class="panel" id="sportsPanel">
+        <h2>Sports <small id="sportsSub">games coming up and what the bot thinks</small></h2>
+        <div id="sportsNote" class="snote"></div>
+        <div id="sportsGames"><div class="empty">Loading…</div></div>
+      </div>
+
+      </div>
+      <div class="tabpane" data-tab="politics"><div class="panel" id="polPanel">
+        <h2>Politics <small id="polSub">Kalshi vs Polymarket</small></h2>
+        <div id="polNote" class="snote"></div>
+        <div id="polRows"><div class="empty">Loading…</div></div>
+      </div>
+
       </div>
     </div>
-
     <div>
       <div class="panel">
-        <h2>Your limits <small>changes apply right away</small></h2>
+        <h2>Settings <small id="setSub">for this tab, plus AI team &amp; money limits</small></h2>
         <form id="settings">
-          <div class="row"><label>Each bet<span class="hint">Dollars used on one bet</span></label>
-            <div class="inp"><span>$</span><input name="STAKE_PER_TRADE" inputmode="decimal"></div></div>
-          <div class="row"><label>Or bet a share of your cash<span class="hint">0 = use the dollar amount above. 10 = each bet is 10% of your Kalshi cash</span></label>
-            <div class="inp"><input name="STAKE_PCT" data-pct inputmode="decimal"><span>%</span></div></div>
-          <div class="row"><label>Most in open bets<span class="hint">Never more than this at once</span></label>
-            <div class="inp"><span>$</span><input name="MAX_AT_RISK" inputmode="decimal"></div></div>
-          <div class="row"><label>Daily loss limit<span class="hint">Stops for the day after losing this</span></label>
-            <div class="inp"><span>$</span><input name="DAILY_LOSS_LIMIT" inputmode="decimal"></div></div>
+          <div class="sg" data-tab="coins">
+          <div class="lshead">Coins: value bets</div>
+          <div class="row" style="grid-template-columns:1fr 160px"><label>Crypto: what to bet on<span class="hint">Normal = value bets. Long shots = small bets on cheap sides for big payouts</span></label>
+            <select name="BET_MODE"><option value="normal">Normal bets</option><option value="longshot">Long shots only</option><option value="both">Both</option><option value="off">No crypto bets</option></select></div>
+          
           <div class="row"><label>Only bet with an edge of<span class="hint">How much cheaper than the bot's odds Kalshi must be, after fees</span></label>
             <div class="inp"><input name="MIN_EDGE" data-cents inputmode="decimal"><span>¢</span></div></div>
           <div class="row"><label>Lowest price to buy<span class="hint">Skip long shots cheaper than this</span></label>
@@ -168,21 +268,127 @@
           <div class="row"><label>Stop buying at minute<span class="hint">Of each 15-minute window</span></label>
             <div class="inp"><input name="ENTRY_END_MIN" inputmode="decimal"></div></div>
           <div class="row coinrow"><label>Coins to trade <span class="coinbtns"><a id="allCoins">All</a><a id="noCoins">None</a></span><span class="hint">More coins = more bets. Your money limits still apply to all of them together.</span></label><div class="coins" id="coins"></div></div>
+          
+          <div class="lshead">Coins: late shots (40x+ in the last minutes)</div>
+          <div class="row"><label>Crypto late shots<span class="hint">Tiny bets on 1-2.5c sides when the price is close enough to the target to flip</span></label>
+            <div class="inp" style="justify-content:flex-end"><input type="checkbox" name="LATE_ON" style="width:auto"></div></div>
+          <div class="row"><label>Late shot size<span class="hint">$0.10–$2.00; the bot bets more on better deals. Payout = contracts × $1 (at 1c, $1 buys ~98 → pays ~$98)</span></label>
+            <div class="inp" style="gap:4px"><span>$</span><input name="LATE_MIN_BET" inputmode="decimal" style="text-align:center" placeholder="0.10"><span>–</span><input name="LATE_MAX_BET" inputmode="decimal" style="text-align:center" placeholder="2.00"></div></div>
+          <div class="row"><label>Only sides costing up to<span class="hint">2.5c pays 40x, 1c pays 100x</span></label>
+            <div class="inp"><input name="LATE_MAX_PRICE" data-cents inputmode="decimal"><span>¢</span></div></div>
+          <div class="row"><label>Bot's chance must be at least<span class="hint">Times the price. 2 = a 1c side needs a 2% chance</span></label>
+            <div class="inp"><input name="LATE_MIN_RATIO" inputmode="decimal"><span>×</span></div></div>
+          <div class="row"><label>"Not too far" from target<span class="hint">Max typical price moves away (lower = only very close calls)</span></label>
+            <div class="inp"><input name="LATE_MAX_Z" inputmode="decimal"><span>moves</span></div></div>
+          <div class="row"><label>Minutes left: start / unsure until / stop</label>
+            <div class="inp" style="gap:4px"><input name="LATE_START_LEFT" inputmode="decimal" style="text-align:center"><span>/</span><input name="LATE_SURE_LEFT" inputmode="decimal" style="text-align:center"><span>/</span><input name="LATE_STOP_LEFT" inputmode="decimal" style="text-align:center"></div></div>
+          <div class="row"><label>Crypto late-shot test budget<span class="hint">Stops once late shots are down this much in total</span></label>
+            <div class="inp"><span>$</span><input name="LATE_BUDGET" inputmode="decimal"></div></div>
+          
+          <div class="lshead">Coins: long shots</div>
+          <div class="row"><label>Long shot size<span class="hint">$0.50–$5.00, sized by the deal</span></label>
+            <div class="inp" style="gap:4px"><span>$</span><input name="LS_MIN_BET" inputmode="decimal" style="text-align:center" placeholder="0.50"><span>–</span><input name="LS_MAX_BET" inputmode="decimal" style="text-align:center" placeholder="5.00"></div></div>
+          <div class="row"><label>Cheapest sides only, up to<span class="hint">20c pays 5x, 10c pays 10x, 5c pays 20x</span></label>
+            <div class="inp"><input name="LS_MAX_PRICE" data-cents inputmode="decimal"><span>¢</span></div></div>
+          <div class="row"><label>Bot's odds must be at least<span class="hint">Times the price. 1.5 = a 10c side needs a 15% chance</span></label>
+            <div class="inp"><input name="LS_MIN_RATIO" inputmode="decimal"><span>×</span></div></div>
+          <div class="row"><label>Long-shot test budget<span class="hint">Stops for good once long shots are down this much in total</span></label>
+            <div class="inp"><span>$</span><input name="LS_BUDGET" inputmode="decimal"></div></div>
+          
+          </div>
+          <div class="sg" data-tab="sports">
+          <div class="lshead">Sports</div>
+          <div class="row"><label>Bet on sports<span class="hint">Bets when Kalshi is cheaper than the sportsbooks' fair odds</span></label>
+            <div class="inp" style="justify-content:flex-end"><input type="checkbox" name="SPORTS_ON" style="width:auto"></div></div>
+          <div class="row"><label>Most per game<span class="hint">Dollars cap per sports bet (edge sizing may bet less)</span></label>
+            <div class="inp"><span>$</span><input name="SPORTS_STAKE" inputmode="decimal"></div></div>
+          <div class="row"><label>Most in open sports bets<span class="hint">Games run for hours; this caps money waiting on results</span></label>
+            <div class="inp"><span>$</span><input name="SPORTS_MAX_OPEN" inputmode="decimal"></div></div>
+          <div class="row"><label>Only bet with an edge of<span class="hint">How much cheaper than fair Kalshi must be, after fees</span></label>
+            <div class="inp"><input name="SPORTS_MIN_EDGE" data-cents inputmode="decimal"><span>¢</span></div></div>
+          <div class="row"><label>Price range<span class="hint">Skip big underdogs / near-sure favourites</span></label>
+            <div class="inp" style="gap:4px"><input name="SPORTS_MIN_PRICE" data-cents inputmode="decimal" style="text-align:center"><span>–</span><input name="SPORTS_MAX_PRICE" data-cents inputmode="decimal" style="text-align:center"><span>¢</span></div></div>
+          <div class="row"><label>Bet within<span class="hint">Hours before the game starts</span></label>
+            <div class="inp"><input name="SPORTS_BET_HOURS" inputmode="decimal"><span>h</span></div></div>
+          <div class="row"><label>Odds must be fresher than<span class="hint">Minutes; older sportsbook odds are refreshed first</span></label>
+            <div class="inp"><input name="SPORTS_MAX_ODDS_AGE_MIN" inputmode="decimal"><span>min</span></div></div>
+          <div class="row coinrow"><label>Leagues</label><div class="coins" id="leagues"></div></div>
+          
+          <div class="lshead">Sports: late shots (live games)</div>
+          <div class="row"><label>Sports late shots<span class="hint">Live games: Kalshi side 2.5c or less but live sportsbooks give it more</span></label>
+            <div class="inp" style="justify-content:flex-end"><input type="checkbox" name="SP_LATE_ON" style="width:auto"></div></div>
+          <div class="row"><label>Sports late shot size<span class="hint">$0.10–$2.00, sized by the deal</span></label>
+            <div class="inp" style="gap:4px"><span>$</span><input name="SP_LATE_MIN_BET" inputmode="decimal" style="text-align:center" placeholder="0.10"><span>–</span><input name="SP_LATE_MAX_BET" inputmode="decimal" style="text-align:center" placeholder="2.00"></div></div>
+          <div class="row"><label>Sports: only sides costing up to</label>
+            <div class="inp"><input name="SP_LATE_MAX_PRICE" data-cents inputmode="decimal"><span>¢</span></div></div>
+          <div class="row"><label>Sports: chance must be at least</label>
+            <div class="inp"><input name="SP_LATE_MIN_RATIO" inputmode="decimal"><span>×</span></div></div>
+          <div class="row"><label>Sports late-shot test budget</label>
+            <div class="inp"><span>$</span><input name="SP_LATE_BUDGET" inputmode="decimal"></div></div>
+          
+          </div>
+          <div class="sg" data-tab="politics">
+          <div class="lshead">Politics</div>
+          <div class="row"><label>Bet on politics<span class="hint">When Kalshi is cheaper than Polymarket on the same question</span></label>
+            <div class="inp" style="justify-content:flex-end"><input type="checkbox" name="POLITICS_ON" style="width:auto"></div></div>
+          <div class="row"><label>Most per question<span class="hint">Dollars cap per politics bet</span></label>
+            <div class="inp"><span>$</span><input name="POLITICS_STAKE" inputmode="decimal"></div></div>
+          <div class="row"><label>Most in open politics bets</label>
+            <div class="inp"><span>$</span><input name="POLITICS_MAX_OPEN" inputmode="decimal"></div></div>
+          <div class="row"><label>Only bet with an edge of<span class="hint">How much cheaper than Polymarket, after fees</span></label>
+            <div class="inp"><input name="POLITICS_MIN_EDGE" data-cents inputmode="decimal"><span>¢</span></div></div>
+          <div class="row"><label>Only questions ending within<span class="hint">Days; keeps money from being tied up for months</span></label>
+            <div class="inp"><input name="POLITICS_MAX_DAYS" inputmode="decimal"><span>days</span></div></div>
+          
+          </div>
+          <div class="sg" data-tab="all">
+          <div class="lshead">AI team</div>
+          <div class="row"><label>Use the AI team<span class="hint">6 AI agents (researcher, quant, skeptic, news, contrarian, risk) + judge</span></label>
+            <div class="inp" style="justify-content:flex-end"><input type="checkbox" name="COUNCIL_ON" style="width:auto"></div></div>
+          <div class="row" style="grid-template-columns:1fr 170px"><label>Which AI<span class="hint">Mix = Claude and GPT analysts debate together; if one fails the other covers</span></label>
+            <select name="COUNCIL_PROVIDER"><option value="mix">Mix: Claude + GPT</option><option value="claude">Claude only</option><option value="gpt">GPT only</option></select></div>
+          <div class="row"><label>Team reviews<span class="hint">Which bets the team debates</span></label>
+            <div class="inp" style="justify-content:flex-end;gap:10px;font-size:13px">
+              <label style="font-weight:400"><input type="checkbox" name="COUNCIL_CRYPTO" style="width:auto"> Crypto</label>
+              <label style="font-weight:400"><input type="checkbox" name="COUNCIL_SPORTS" style="width:auto"> Sports</label>
+              <label style="font-weight:400"><input type="checkbox" name="COUNCIL_POLITICS" style="width:auto"> Politics</label></div></div>
+          <div class="row"><label>Daily AI budget<span class="hint">Most spent on AI calls per day (a debate costs ~1-5c)</span></label>
+            <div class="inp"><span>$</span><input name="COUNCIL_DAILY_BUDGET" inputmode="decimal"></div></div>
+          
+          <div class="lshead">Bet sizing</div>
+          <div class="row" style="grid-template-columns:1fr 160px"><label>How to size bets<span class="hint">By edge = bigger bets on better deals, tiny on thin ones (never above each per-bet amount)</span></label>
+            <select name="SIZING"><option value="edge">By edge (smart)</option><option value="fixed">Fixed amount</option></select></div>
+          <div class="row"><label>Edge sizing strength<span class="hint">Share of the "ideal" Kelly bet. 25% is cautious; higher = bigger swings</span></label>
+            <div class="inp"><input name="KELLY_FRACTION" data-pct inputmode="decimal"><span>%</span></div></div>
+          
+          <div class="lshead">Overall money limits</div>
+          <div class="row"><label>Each bet<span class="hint">Dollars used on one bet</span></label>
+            <div class="inp"><span>$</span><input name="STAKE_PER_TRADE" inputmode="decimal"></div></div>
+          <div class="row"><label>Or bet a share of your cash<span class="hint">0 = use the dollar amount above. 10 = each bet is 10% of your Kalshi cash</span></label>
+            <div class="inp"><input name="STAKE_PCT" data-pct inputmode="decimal"><span>%</span></div></div>
+          <div class="row"><label>Most in open bets<span class="hint">Never more than this at once</span></label>
+            <div class="inp"><span>$</span><input name="MAX_AT_RISK" inputmode="decimal"></div></div>
+          <div class="row"><label>Daily loss limit<span class="hint">Stops for the day after losing this (minimum $10)</span></label>
+            <div class="inp"><span>$</span><input name="DAILY_LOSS_LIMIT" inputmode="decimal"></div></div>
+          
+          </div>
           <button type="submit" class="btn-save" style="margin-top:10px;width:100%">Save limits</button>
           <div class="msg" id="saveMsg"></div>
         </form>
       </div>
+    </div>
+  </div>
 
-      <div class="panel sec">
-        <h2>By day</h2>
-        <table id="days"></table>
-      </div>
-
-      <div class="panel sec">
-        <h2>Activity <small>latest bot messages</small></h2>
-        <div class="log" id="log"></div>
+  <div class="grid cols sec">
+    <div><div class="panel">
+        <h2>Bets <small>newest first</small></h2>
+        <div class="tablewrap"><table id="trades"></table></div>
       </div>
     </div>
+    <div><div class="panel">
+        <h2>Activity <small>latest bot messages</small></h2>
+        <div class="log" id="log"></div>
+      </div></div>
   </div>
 </div>
 
@@ -190,7 +396,7 @@
 const $ = id => document.getElementById(id);
 const money = v => v == null ? '–' : (v < 0 ? '−$' : '$') + Math.abs(v).toFixed(2);
 const signed = v => v == null ? '–' : (v > 0 ? '+' : v < 0 ? '−' : '') + '$' + Math.abs(v).toFixed(2);
-const cents = v => v == null ? '–' : Math.round(v * 100) + '¢';
+const cents = v => v == null ? '–' : (v < 0.0095 ? (v * 100).toFixed(1) : Math.round(v * 100)) + '¢';
 const cls = v => v > 0 ? 'pos' : v < 0 ? 'neg' : '';
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let data = null, formDirty = false;
@@ -198,6 +404,75 @@ let data = null, formDirty = false;
 function setTile(id, text, c, sub) {
   $(id).textContent = text; $(id).className = 'v ' + (c || '');
   if (sub !== undefined) $(id + 'S').textContent = sub;
+}
+
+
+// ---- collapsible settings sections (closed by default, remembered) ----
+(function () {
+  let openSet = {};
+  try { openSet = JSON.parse(localStorage.getItem('kbOpen') || '{}'); } catch (e) {}
+  document.querySelectorAll('#settings .lshead').forEach(h => {
+    const body = document.createElement('div'); body.className = 'sbody';
+    let n = h.nextElementSibling;
+    while (n && !n.classList.contains('lshead')) { const nx = n.nextElementSibling; body.appendChild(n); n = nx; }
+    h.after(body);
+    const key = h.textContent.trim();
+    const hint = document.createElement('span'); hint.className = 'hint';
+    hint.textContent = body.querySelectorAll('.row').length + ' settings';
+    h.appendChild(hint);
+    h.classList.add('tog');
+    const set = open => { h.classList.toggle('closed', !open); body.classList.toggle('closed', !open); };
+    set(!!openSet[key]);
+    h.addEventListener('click', () => {
+      const open = h.classList.contains('closed'); set(open); openSet[key] = open;
+      try { localStorage.setItem('kbOpen', JSON.stringify(openSet)); } catch (e) {}
+    });
+  });
+})();
+
+// ---- tabs ----
+const KIND = {normal: ['Coins', 'coins'], longshot: ['Coins · long shot', 'coins'], lateshot: ['Coins · late shot', 'coins'],
+  sports: ['Sports', 'sports'], sports_late: ['Sports · late shot', 'sports'], politics: ['Politics', 'politics']};
+function kindOf(k, label) {
+  if (KIND[k]) return KIND[k];
+  const l = (label || '').toLowerCase();
+  if (l.includes('sport')) return [label, 'sports'];
+  if (l.includes('polit')) return [label, 'politics'];
+  return [label || 'Coins', 'coins'];
+}
+let curTab = 'coins';
+try { curTab = localStorage.getItem('kbTab') || 'coins'; } catch (e) {}
+if (location.hash && ['#coins', '#sports', '#politics'].includes(location.hash)) curTab = location.hash.slice(1);
+function showTab(t) {
+  curTab = t;
+  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
+  document.querySelectorAll('.tabpane,.sg').forEach(el => el.classList.toggle('on', el.dataset.tab === t || el.dataset.tab === 'all'));
+  try { localStorage.setItem('kbTab', t); } catch (e) {}
+}
+document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
+showTab(curTab);
+
+function renderOpen(d) {
+  const real = (d.open || []).map(p => ({real: true, kind: kindOf(p.kind), title: p.title || p.ticker, side: p.side,
+    count: p.count, entry: p.entry, cost: p.cost, close: p.close_time}));
+  const fake = ((d.strategies || {}).virtual || []).map(p => ({real: false, kind: kindOf(null, p.label), title: p.title || p.ticker,
+    side: p.side, cost: p.cost}));
+  const all = real.concat(fake);
+  const n = {coins: 0, sports: 0, politics: 0};
+  all.forEach(r => n[r.kind[1]]++);
+  for (const k in n) $('tc-' + k).textContent = n[k] || '';
+  const riding = real.reduce((a, r) => a + r.cost, 0), pay = real.reduce((a, r) => a + (r.count || 0), 0);
+  $('openSub').textContent = real.length ? `${real.length} real bet${real.length === 1 ? '' : 's'}: ${money(riding)} riding, pays up to ${money(pay)}` +
+    (fake.length ? ` · ${fake.length} pretend` : '') : (fake.length ? `no real bets right now · ${fake.length} pretend` : 'nothing riding right now');
+  if (!all.length) { $('openBets').innerHTML = '<tr><td class="empty">No bets waiting for a result. New ones show up here the moment they\'re placed.</td></tr>'; return; }
+  const now = Date.now();
+  $('openBets').innerHTML = '<tr><th>Bet</th><th>Type</th><th>Side</th><th>Paid</th><th>Pays if right</th><th>Ends</th></tr>' + all.map(r => {
+    let ends = '';
+    if (r.close) { const m = (new Date(r.close) - now) / 60000; ends = m <= 0 ? 'settling' : m < 90 ? Math.round(m) + ' min' : m < 2880 ? (m / 60).toFixed(1) + 'h' : Math.round(m / 1440) + ' days'; }
+    const payTxt = r.real && r.count ? `<b class="pos">${money(r.count)}</b> <span class="mute">(${(r.count / Math.max(r.cost, 0.01)).toFixed(1)}×)</span>` : '–';
+    return `<tr${r.real ? '' : ' class="mute"'}><td>${esc(r.title)}</td><td><span class="kind">${esc(r.kind[0])}${r.real ? '' : ' · pretend'}</span></td>
+      <td>${esc((r.side || '').toUpperCase())}</td><td>${money(r.cost)}${r.entry ? ' <span class="mute">@ ' + cents(r.entry) + '</span>' : ''}</td><td>${payTxt}</td><td>${ends}</td></tr>`;
+  }).join('');
 }
 
 function render(d) {
@@ -242,12 +517,28 @@ function render(d) {
        edge >= 0 ? 'So far the strategy is ahead.' : 'So far the strategy is losing — consider pausing or changing the limits.');
   }
 
+  const ls = d.longshot;
+  if (ls && d.settings.BET_MODE !== 'normal') {
+    $('lsbar').style.display = 'flex';
+    const used = Math.min(1, Math.max(0, (ls.budget - ls.left) / ls.budget));
+    $('lsfill').style.width = (100 - used * 100) + '%';
+    $('lstext').innerHTML = `<b>${money(ls.left)}</b> of ${money(ls.budget)} left · ${ls.bets} finished · ${ls.wins} hit` +
+      (ls.best ? ` · best payout <b class="pos">${money(ls.best)}</b>` : '') + ` · net <b class="${cls(ls.net)}">${signed(ls.net)}</b>` +
+      (ls.open ? ` · ${money(ls.open)} riding now` : '');
+  } else { $('lsbar').style.display = 'none'; }
+
   const sup = d.support || {};
   $('supportBtn').style.display = sup.url ? '' : 'none';
   if (sup.url) { $('supportBtn').href = sup.url; $('thanksGo').href = sup.url; }
   if (!thanksClosed) $('thanks').style.display = sup.ask ? 'flex' : 'none';
 
+  renderOpen(d);
   renderMarkets(live.markets || []);
+  renderSports(d.sports);
+  renderStrats(d.strategies);
+  renderForecasts(d.forecasts);
+  renderAI(d.council);
+  renderPolitics(d.politics);
   renderChart(st.series);
   renderTrades(d.trades);
   renderDays(st.days);
@@ -262,12 +553,14 @@ function renderMarkets(ms) {
   $('markets').innerHTML = ms.map(m => {
     const yes = m.yes_bid != null && m.yes_ask != null ? (m.yes_bid + m.yes_ask) / 2 : null;
     const ypct = yes == null ? 50 : Math.round(yes * 100);
-    const badge = m.decision === 'NO TRADE' ? 'NO' : m.decision;
-    const label = {BUY:'BUY', HOLDING:'HOLDING', 'NO TRADE':'NO TRADE', WAIT:'WATCHING', PASSED:'WINDOW PASSED', DONE:'DONE', STOPPED:'STOPPED', PAUSED:'PAUSED'}[m.decision] || m.decision;
+    const isLate = m.kind === 'lateshot' && (m.decision === 'BUY' || m.decision === 'HOLDING');
+    const isLS = (m.kind === 'longshot' || isLate) && (m.decision === 'BUY' || m.decision === 'HOLDING');
+    const badge = isLS ? 'LONG' : m.decision === 'NO TRADE' ? 'NO' : m.decision;
+    const label = {BUY:'BUY', HOLDING:'HOLDING', 'NO TRADE':'NO TRADE', WAIT:'WATCHING', PASSED:'WINDOW PASSED', DONE:'DONE', STOPPED:'STOPPED', PAUSED:'PAUSED', SHADOW:'PRETEND BET'}[m.decision] || m.decision;
     const minute = Math.max(0, Math.min(15, m.minute));
     return `<div class="mkt">
       <div class="mkt-top"><div class="mkt-title">${esc(m.title || m.coin + ' · ' + m.ticker)}</div>
-        <span class="badge b-${badge}">${label}</span></div>
+        <span class="badge b-${badge}">${isLS ? (isLate ? 'LATE SHOT ' : 'LONG SHOT ') + (m.decision === 'BUY' ? 'BUY' : '') : label}</span></div>
       <div class="odds"><div class="y" style="width:${ypct}%">YES ${cents(m.yes_ask)}</div><div class="n" style="width:${100 - ypct}%">NO ${cents(m.no_ask)}</div></div>
       <div class="timeline"><div class="win" style="left:${s.ENTRY_START_MIN / 15 * 100}%;width:${(s.ENTRY_END_MIN - s.ENTRY_START_MIN) / 15 * 100}%"></div>
         <div class="now" style="left:calc(${minute / 15 * 100}% - 1px)"></div></div>
@@ -280,6 +573,100 @@ function renderMarkets(ms) {
       </div>` : ''}
       <div class="reason">${esc(m.reason)}</div>
     </div>`;
+  }).join('');
+}
+
+function renderAI(c) {
+  if (!c) return;
+  $('aiSub').textContent = `${c.debates} debates today · AI spend $${(c.spent || 0).toFixed(2)} of $${(+c.budget).toFixed(2)} · ${c.models.join(' + ')}`;
+  const missing = c.provider === 'mix' && c.key_set && c.team.length === 1 ? `Set to mix, but only the ${c.team[0]} key is pasted, so the team uses ${c.team[0]} only. Add ${c.team[0] === 'Claude' ? 'OPENAI_API_KEY' : 'ANTHROPIC_API_KEY'} in bot.py for the mix.` :
+    (c.provider !== 'mix' && c.key_set && !c.team.map(t => t.toLowerCase()).includes(c.provider === 'gpt' ? 'gpt' : 'claude') ? `Set to ${c.provider === 'gpt' ? 'GPT' : 'Claude'} only, but that key isn't pasted, so the team uses ${c.team.join(' + ')}.` : '');
+  $('aiNote').textContent = !c.key_set ? 'Add a Claude key (ANTHROPIC_API_KEY) and/or an OpenAI key (OPENAI_API_KEY) in bot.py to turn the AI team on. The bot works without them.' : (!c.on ? 'AI team is off.' : missing);
+  if (!c.log.length) return;
+  $('aiLog').innerHTML = c.log.slice(0, 8).map(x => {
+    const ok = x.approve;
+    return `<div class="debate"><div class="game-top"><div><b>${esc(x.question)}</b>
+      <div class="game-meta">${x.t} · ${esc(x.kind)} · proposed ${x.side.toUpperCase()} at ${cents(x.price)} · bot's math ${x.math == null ? '?' : Math.round(x.math * 100) + '%'} · AI ${x.ai_prob == null ? '?' : Math.round(x.ai_prob * 100) + '%'} (weight ${Math.round((x.ai_weight || 0) * 100)}%) → blended ${Math.round((x.prob_yes || 0) * 100)}% YES · ${x.votes_for}/5 lean ${x.side.toUpperCase()}${x.red_flag ? ' · <b class="neg">RED FLAG</b>' : ''}${x.team ? ' · team ' + esc(x.team) + ', judge ' + esc(x.judge_ai) : ''} · ${x.secs}s · $${x.cost.toFixed(3)}</div></div>
+      <span class="badge b-${ok ? 'APPROVE' : 'VETO'}" style="white-space:nowrap">${ok ? 'APPROVED · ' + x.size.toUpperCase() : 'SKIP'}</span></div>
+      <div class="reason">${esc(x.summary)}</div>
+      <details><summary>See what each agent said</summary>${x.agents.map(a => `<div class="agent"><b>${esc(a.agent)}</b>${a.ai ? ` <span class="kind">${esc(a.ai)}</span>` : ''}${a.asked ? ` <span class="hint2">asked ${esc(a.asked)}</span>` : ''} ${esc(a.vote)} · ${a.prob_yes == null ? '?' : Math.round(a.prob_yes * 100) + '%'} YES — ${esc(a.reason)}</div>`).join('')}</details></div>`;
+  }).join('');
+}
+
+function renderStrats(st) {
+  if (!st) return;
+  const pct = r => r.staked > 0 ? ` (${r.roi >= 0 ? '+' : ''}${Math.round(r.roi * 100)}%)` : '';
+  $('strats').innerHTML = st.rows.length ? '<tr><th>Strategy</th><th>Mode</th><th class="r">Real bets</th><th class="r">Real profit</th><th class="r">Pretend bets</th><th class="r">Pretend profit</th><th class="r">Size</th><th></th></tr>' +
+    st.rows.map(r => `<tr><td>${esc(r.label)}</td>
+      <td><span class="badge b-${r.mode === 'paused' ? 'PAUSEDS' : r.mode.toUpperCase()}">${r.mode === 'shadow' ? 'PROVING' : r.mode.toUpperCase()}</span>${r.auto ? ' <span class="hint2">auto</span>' : ''}</td>
+      <td class="r">${r.live.bets} (${r.live.wins}W)</td><td class="r ${cls(r.live.net)}">${signed(r.live.net)}${pct(r.live)}</td>
+      <td class="r">${r.shadow.bets}${r.mode === 'shadow' ? '/' + r.need : ''} (${r.shadow.wins}W)</td><td class="r ${cls(r.shadow.net)}">${signed(r.shadow.net)}${pct(r.shadow)}${r.shadow.t != null ? ` <span class="hint2">t ${r.shadow.t.toFixed(1)}</span>` : ''}</td>
+      <td class="r">×${r.mult}</td>
+      <td class="r">${['live', 'shadow', 'paused'].filter(m => m !== r.mode).map(m => `<button class="mini" data-k="${esc(r.key)}" data-m="${m}">${m === 'live' ? 'Go live' : m === 'shadow' ? 'Prove first' : 'Pause'}</button>`).join('')}</td></tr>`).join('')
+    : '<tr><td class="empty">Strategies appear here after their first bet or pretend bet.</td></tr>';
+  const R = st.rules;
+  $('stratRules').textContent = `PROVING = pretend bets only; goes live by itself after enough pretend bets (shown as done/needed) with a profit that's convincing, not luck (t-score ≥ ${R.promote_t}). LIVE strategies pause themselves after ${R.live_min} bets if down more than ${Math.round(-R.pause_roi * 100)}%, and bet 1.5× if up more than ${Math.round(R.boost_roi * 100)}%.` + (st.virtual.length ? ` ${st.virtual.length} pretend bet(s) waiting for results.` : '');
+  $('strats').querySelectorAll('button[data-k]').forEach(b => b.onclick = async () => {
+    await fetch('/api/strategy', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({key: b.dataset.k, mode: b.dataset.m})});
+    refresh();
+  });
+}
+
+function renderForecasts(f) {
+  if (!f) return;
+  $('fcSub').textContent = `${f.total} scored · ${f.waiting} waiting for results · includes markets the bot skipped`;
+  if (!f.cats.length) return;
+  const nm = {crypto: 'Coins', sports: 'Sports', politics: 'Politics'};
+  $('fcBody').innerHTML = '<div class="grid fc3">' + f.cats.map(c => {
+    const rows = c.sources.map(x => `<tr><td>${esc(x.name)}</td><td class="r">${x.n}</td><td class="r">${x.brier.toFixed(3)}</td>
+      <td class="r ${x.vs_market == null ? '' : x.vs_market > 0 ? 'pos' : x.vs_market < 0 ? 'neg' : ''}">${x.vs_market == null ? '–' : (x.vs_market > 0 ? '+' : '') + x.vs_market.toFixed(3)}${x.vs_market != null && x.vs_n < 100 ? ' <span class="hint2">few</span>' : ''}</td></tr>`).join('');
+    const cal = c.calibration.filter(b => b.n >= 3).map(b => `<tr><td>${b.range}</td><td class="r">${b.n}</td><td class="r">${Math.round(b.said * 100)}%</td><td class="r">${Math.round(b.happened * 100)}%</td></tr>`).join('');
+    return `<div><h3 style="margin:4px 0 6px;font-size:14px">${nm[c.cat]} <span class="hint2">${c.settled} settled · AI weight ${Math.round((c.ai_weight || 0) * 100)}%</span></h3>
+      <table><tr><th>Forecaster</th><th class="r">Markets</th><th class="r">Score</th><th class="r">vs Kalshi</th></tr>${rows}</table>
+      ${cal ? `<details style="margin-top:6px"><summary>Is the bot's math honest? (calibration)</summary><table><tr><th>Bot said</th><th class="r">Markets</th><th class="r">Avg said</th><th class="r">Happened</th></tr>${cal}</table></details>` : ''}</div>`;
+  }).join('') + '</div>';
+}
+
+function renderPolitics(p) {
+  if (!p) return;
+  $('polSub').textContent = p.t ? `${p.kalshi} Kalshi · ${p.poly} Polymarket questions · ${p.matched} matched · checked ${p.t}` : 'Kalshi vs Polymarket (checks every 15 min)';
+  $('polNote').textContent = (p.note || '') + (!p.on ? ' Politics betting is off.' : '');
+  const rows = p.rows || [];
+  if (!rows.length) { $('polRows').innerHTML = '<div class="empty">No matched questions yet (first check runs a minute after start).</div>'; return; }
+  $('polRows').innerHTML = rows.slice(0, 15).map(r => {
+    const badge = r.decision === 'NO TRADE' ? 'NO' : r.decision;
+    return `<div class="pol"><div class="game-top"><div class="q"><b>${esc(r.kalshi)}</b><br><span>Polymarket: ${esc(r.poly)} · match ${Math.round(r.score * 100)}%${r.days != null ? ' · ends in ' + r.days + ' days' : ''}</span></div>
+      <span class="badge b-${badge}" style="white-space:nowrap">${r.decision === 'SHADOW' ? 'PRETEND BET' : r.decision}</span></div>
+      <div class="game-meta">Polymarket YES ${Math.round(r.fair * 100)}% · Kalshi YES ${cents(r.yes_ask)} / NO ${cents(r.no_ask)}</div>
+      <div class="reason">${esc(r.reason)}</div></div>`;
+  }).join('');
+}
+
+function renderSports(sp) {
+  if (!sp) return;
+  const sub = [];
+  if (sp.credits_left != null) sub.push(`odds credits: ${sp.credits_left} left this month, ${sp.credits_today}/${sp.credits_allowed} used today`);
+  if (sp.updated) sub.push('updated ' + sp.updated);
+  $('sportsSub').textContent = sub.join(' · ') || "games coming up and what the bot thinks";
+  $('sportsNote').textContent = !sp.key_set ? 'Add your free Odds API key in bot.py (ODDS_API_KEY) to turn sports on.' : (sp.error || sp.note || '') + (!sp.on ? ' Sports betting is off.' : '');
+  const byGame = {};
+  (sp.games || []).forEach(r => { (byGame[r.event] = byGame[r.event] || []).push(r); });
+  const games = Object.values(byGame);
+  if (!games.length) { $('sportsGames').innerHTML = '<div class="empty">No matched games right now. Games appear here once Kalshi lists them and the sportsbooks have them.</div>'; return; }
+  $('sportsGames').innerHTML = games.slice(0, 25).map(rows => {
+    const top = rows.find(r => r.decision === 'BUY') || rows[0];
+    const st = new Date(top.start);
+    const when = st.toLocaleString([], {weekday: 'short', hour: 'numeric', minute: '2-digit'});
+    const inH = top.hours > 0 ? (top.hours < 1 ? Math.round(top.hours * 60) + ' min' : top.hours.toFixed(1) + 'h') : 'started';
+    const badge = top.decision === 'NO TRADE' ? 'NO' : top.decision;
+    const label = {WAIT: 'WAITING', PASSED: 'STARTED', SHADOW: 'PRETEND BET'}[top.decision] || top.decision;
+    return `<div class="game"><div class="game-top"><div><div class="game-title">${esc(top.game)}</div>
+      <div class="game-meta">${esc(top.sport)} · ${when} (${inH}) · ${top.books || 0} books${top.odds_age != null ? ' · odds ' + top.odds_age + ' min old' : ''}</div></div>
+      <span class="badge b-${badge}">${label}</span></div>
+      <table><tr><th>Pick</th><th class="r">Fair</th><th class="r">Kalshi YES</th><th class="r">Kalshi NO</th></tr>
+      ${rows.map(r => `<tr><td>${esc(r.team || '?')}${r.decision === 'BUY' ? ' <b class="pos">← ' + (r.side === 'yes' ? 'BUY YES' : 'BUY NO') + '</b>' : ''}</td>
+        <td class="r">${r.fair == null ? '–' : Math.round(r.fair * 100) + '%'}</td><td class="r">${cents(r.yes_ask)}</td><td class="r">${cents(r.no_ask)}</td></tr>`).join('')}
+      </table><div class="reason">${esc(top.reason)}</div></div>`;
   }).join('');
 }
 
@@ -323,7 +710,9 @@ function renderTrades(rows) {
   $('trades').innerHTML = '<tr><th>Time</th><th>What</th><th>Side</th><th class="r">Qty</th><th class="r">Price</th><th class="r">Amount</th><th class="r">Profit</th></tr>' +
     rows.map(r => {
       const p = r['pnl_$'] === '' ? null : parseFloat(r['pnl_$']);
-      const what = r.event === 'SETTLE' ? (r.note === 'won' ? 'Won' : 'Lost') : names[r.event] || r.event;
+      const nt = r.note || '';
+      const tag = nt.includes('late') ? ' · late shot' : nt.includes('long shot') ? ' · long shot' : '';
+      const what = (r.event === 'SETTLE' ? (nt.startsWith('won') ? 'Won' : 'Lost') : names[r.event] || r.event) + tag;
       return `<tr><td>${esc(r.time.slice(5, 16))}</td><td>${esc(what)}</td><td>${esc(r.side)}</td><td class="r">${esc(r.contracts)}</td>
         <td class="r">${r.event === 'SETTLE' ? '' : cents(parseFloat(r.price))}</td><td class="r">${money(parseFloat(r['amount_$']))}</td>
         <td class="r ${cls(p)}">${p == null ? '' : signed(p)}</td></tr>`;
@@ -338,17 +727,30 @@ function renderDays(days) {
 
 function fillForm(s, known) {
   const f = $('settings');
+  f.querySelector('select[name=BET_MODE]').value = s.BET_MODE || 'normal';
+  f.querySelector('input[name=SPORTS_ON]').checked = !!s.SPORTS_ON;
+  f.querySelector('input[name=POLITICS_ON]').checked = !!s.POLITICS_ON;
+  f.querySelector('input[name=LATE_ON]').checked = !!s.LATE_ON;
+  ['COUNCIL_ON', 'COUNCIL_CRYPTO', 'COUNCIL_SPORTS', 'COUNCIL_POLITICS'].forEach(k => f.querySelector(`input[name=${k}]`).checked = !!s[k]);
+  f.querySelector('input[name=SP_LATE_ON]').checked = !!s.SP_LATE_ON;
+  f.querySelector('select[name=SIZING]').value = s.SIZING || 'edge';
+  f.querySelector('select[name=COUNCIL_PROVIDER]').value = s.COUNCIL_PROVIDER || 'mix';
+  const lg = (data && data.sports && data.sports.sports) || {};
+  $('leagues').innerHTML = Object.entries(lg).map(([k, name]) =>
+    `<label class="${(s.SPORTS_LIST || []).includes(k) ? 'on' : ''}"><input type="checkbox" value="${k}" ${(s.SPORTS_LIST || []).includes(k) ? 'checked' : ''}> ${esc(name)}</label>`).join('');
   f.querySelectorAll('input[name]').forEach(inp => {
-    const v = s[inp.name]; if (v === undefined) return;
-    if (inp.hasAttribute('data-cents') || inp.hasAttribute('data-pct')) inp.value = Math.round(v * 100);
+    const v = s[inp.name]; if (v === undefined || inp.type === 'checkbox') return;
+    if (inp.hasAttribute('data-cents') || inp.hasAttribute('data-pct')) inp.value = +(v * 100).toFixed(1);
     else if (inp.name.endsWith('_MIN')) inp.value = +(+v).toFixed(1);
+    else if (['LS_MIN_RATIO', 'SPORTS_BET_HOURS', 'SPORTS_MAX_ODDS_AGE_MIN', 'POLITICS_MAX_DAYS', 'LATE_MIN_RATIO', 'LATE_MAX_Z',
+              'LATE_START_LEFT', 'LATE_SURE_LEFT', 'LATE_STOP_LEFT', 'SP_LATE_MIN_RATIO'].includes(inp.name)) inp.value = +(+v).toFixed(2);
     else inp.value = (+v).toFixed(2);
   });
   $('coins').innerHTML = Object.entries(known).map(([k, name]) =>
     `<label class="${s.SERIES.includes(k) ? 'on' : ''}"><input type="checkbox" value="${k}" ${s.SERIES.includes(k) ? 'checked' : ''}> ${esc(name)}</label>`).join('');
 }
 
-function markCoins() { $('coins').querySelectorAll('label').forEach(l => l.classList.toggle('on', l.querySelector('input').checked)); }
+function markCoins() { document.querySelectorAll('#coins label, #leagues label').forEach(l => l.classList.toggle('on', l.querySelector('input').checked)); }
 function setAll(v) { $('coins').querySelectorAll('input').forEach(c => c.checked = v); markCoins(); $('settings').dispatchEvent(new Event('input')); }
 $('allCoins').addEventListener('click', () => setAll(true));
 $('noCoins').addEventListener('click', () => setAll(false));
@@ -358,11 +760,16 @@ $('settings').addEventListener('submit', async e => {
   e.preventDefault();
   const body = {};
   $('settings').querySelectorAll('input[name]').forEach(inp => {
+    if (inp.type === 'checkbox') { body[inp.name] = inp.checked; return; }
     let v = parseFloat(String(inp.value).replace(',', '.'));
     if (inp.hasAttribute('data-cents') || inp.hasAttribute('data-pct')) v = v / 100;
     body[inp.name] = v;
   });
   body.SERIES = [...$('coins').querySelectorAll('input:checked')].map(c => c.value);
+  body.SPORTS_LIST = [...$('leagues').querySelectorAll('input:checked')].map(c => c.value);
+  body.BET_MODE = $('settings').querySelector('select[name=BET_MODE]').value;
+  body.SIZING = $('settings').querySelector('select[name=SIZING]').value;
+  body.COUNCIL_PROVIDER = $('settings').querySelector('select[name=COUNCIL_PROVIDER]').value;
   const res = await post(body);
   const m = $('saveMsg');
   if (res.ok) { formDirty = false; m.style.color = 'var(--green)'; m.textContent = 'Saved. The bot is using your new limits.'; refresh(); }

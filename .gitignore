@@ -16,3 +16,9 @@ bot_log.txt
 __pycache__/
 *.pyc
 .DS_Store
+strategies.json
+strategies.json.tmp
+forecasts.json
+forecasts.json.tmp
+longshot.json
+*.tmp
